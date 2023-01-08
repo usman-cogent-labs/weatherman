@@ -80,13 +80,14 @@ def parse_files(filenames):
 
 
 def get_year_values(data):
-    highest = {"temperature": 0, "date": None}
-    lowest = {"temperature": 1000, "date": None}
-    humidest = {"temperature": 0, "date": None}
+    highest = {"temperature": 0, "date": ''}
+    lowest = {"temperature": 1000, "date": ''}
+    humidest = {"temperature": 0, "date": ''}
 
     for month_data in data:
         for record in month_data['records']:
-            if record['highest_temperature'].isnumeric() and int(record['highest_temperature']) > highest['temperature']:
+            if record['highest_temperature'].isnumeric() and int(record['highest_temperature']) > highest[
+                'temperature']:
                 highest['temperature'] = int(record['highest_temperature'])
                 highest['date'] = record['date']
             if record['lowest_temperature'].isnumeric() and int(record['lowest_temperature']) < lowest['temperature']:
@@ -99,20 +100,40 @@ def get_year_values(data):
     lowest_date = lowest['date'].split('-')
     humidest_date = humidest['date'].split('-')
     print(
-        f"Highest: {highest['temperature']}C on {datetime.datetime( int(highest_date[0]), int(highest_date[1]),int(highest_date[2])).strftime('%B %d')}")
+        f"Highest: {highest['temperature']}C on {datetime.datetime(int(highest_date[0]), int(highest_date[1]), int(highest_date[2])).strftime('%B %d')}")
     print(
-        f"Lowest: {lowest['temperature']}C on {datetime.datetime( int(lowest_date[0]), int(lowest_date[1]),int(lowest_date[2])).strftime('%B %d')}")
+        f"Lowest: {lowest['temperature']}C on {datetime.datetime(int(lowest_date[0]), int(lowest_date[1]), int(lowest_date[2])).strftime('%B %d')}")
     print(
         f"Humidity: {humidest['temperature']}% on {datetime.datetime(int(humidest_date[0]), int(humidest_date[1]), int(humidest_date[2])).strftime('%B %d')}")
+
+
+def check_command_month(data):
+    data = data.split('/')
+    if int(data[1]) > max(MONTHS.keys()) or int(data[1]) < min(MONTHS.keys()):
+        return -1
+    elif MONTHS[int(data[1])]:
+        return MONTHS[int(data[1])]
+    else:
+        return -1
+
+
+def check_month_in_command(data):
+    data = data.split('/')
+    if len(data) == 1:
+        return False
+    else:
+        return True
 
 
 if __name__ == '__main__':
     if len(sys.argv) > 2:
         command_type = sys.argv[1]
         all_files = get_files_from_drectory()
-        file_names = get_year_file_names(all_files, sys.argv[2])
-        file_data = parse_files(file_names)
-        get_year_values(file_data)
-
+        if check_month_in_command(sys.argv[2]) and check_command_month(sys.argv[2]) != -1:
+            pass
+        elif command_type == '-e' and check_month_in_command(sys.argv[2]) is not True:
+            file_names = get_year_file_names(all_files, sys.argv[2])
+            file_data = parse_files(file_names)
+            get_year_values(file_data)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
