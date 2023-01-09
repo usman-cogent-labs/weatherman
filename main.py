@@ -1,7 +1,7 @@
 import os
 import sys
 import datetime
-from colorama import Fore
+from colorama import Fore, Style
 
 LOWEST_TEMPERATURE = 'Min TemperatureC'
 HIGHEST_TEMPERATURE = 'Max TemperatureC'
@@ -118,8 +118,8 @@ def check_command_month(data):
         return -1
 
 
-def check_month_in_command(command):
-    data = command.split('/')
+def check_month_in_command(command_data):
+    data = command_data.split('/')
     if len(data) == 1:
         return False
     else:
@@ -130,8 +130,8 @@ def get_month_data_from_data(data, month):
     return next((item for item in data if item["month"] == month), None)
 
 
-def print_monthly_average_data(data):
-    year, month = get_year_month_from_command()
+def print_monthly_average_data(data, command_data):
+    year, month = get_year_month_from_command(command_data)
     highest_temp_data = {
         "sum": 0,
         "count": 0,
@@ -169,28 +169,28 @@ def draw_month_graph(data, month):
     print(month_data)
 
 
-def get_year_month_from_command():
-    if check_month_in_command(sys.argv[2]):
-        year, month = sys.argv[2].split('/')
+def get_year_month_from_command(command_data):
+    if check_month_in_command(command_data):
+        year, month = command_data.split('/')
         month = MONTHS[int(month)]
         return year, month
     else:
-        return sys.argv[2]
+        return command_data
 
 
-def get_yearly_data(files):
-    if check_month_in_command(sys.argv[2]):
-        year, month = get_year_month_from_command()
+def get_yearly_data(files, command_data):
+    if check_month_in_command(command_data):
+        year, month = get_year_month_from_command(command_data)
     else:
-        year = get_year_month_from_command()
+        year = get_year_month_from_command(command_data)
     file_names = get_year_file_names(files, year)
     file_data = parse_files(file_names)
     return file_data
 
 
-def get_monthly_data(files):
-    year, month = get_year_month_from_command()
-    yearly_data = get_yearly_data(files)
+def get_monthly_data(files, command_data):
+    year, month = get_year_month_from_command(command_data)
+    yearly_data = get_yearly_data(files, command_data)
     monthly_data = get_month_data_from_data(yearly_data, month)
     return monthly_data
 
@@ -201,18 +201,23 @@ def print_monthly_data(monthly_data):
             print(Fore.RED + '+' * int(record['highest_temperature']), record['highest_temperature'] + 'C')
         if bool(record['lowest_temperature']) is True:
             print(Fore.BLUE + '+' * int(record['lowest_temperature']), record['lowest_temperature'] + 'C')
+    print(Style.RESET_ALL)
+
+
+
+def execute_command(command_type, command_data):
+    files = get_files_from_drectory()
+    if command_type == '-e':
+        yearly_data = get_yearly_data(files, command_data)
+        print_yearly_data(yearly_data)
+    if command_type == '-a':
+        monthly_data = get_monthly_data(files, command_data)
+        print_monthly_average_data(monthly_data, command_data)
+    if command_type == '-c':
+        monthly_data = get_monthly_data(files, command_data)
+        print_monthly_data(monthly_data)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 2:
-        command_type = sys.argv[1]
-        files = get_files_from_drectory()
-        if command_type == '-e':
-            yearly_data = get_yearly_data(files)
-            print_yearly_data(yearly_data)
-        if command_type == '-a':
-            monthly_data = get_monthly_data(files)
-            print_monthly_average_data(monthly_data)
-        if command_type == '-c':
-            monthly_data = get_monthly_data(files)
-            print_monthly_data(monthly_data)
+    for i in range(1, len(sys.argv), 2):
+        execute_command(sys.argv[i], sys.argv[i + 1])
