@@ -86,8 +86,8 @@ def get_year_values(data):
 
     for month_data in data:
         for record in month_data['records']:
-            if record['highest_temperature'].isnumeric() and int(record['highest_temperature']) > highest[
-                'temperature']:
+            if record['highest_temperature'].isnumeric() \
+                    and int(record['highest_temperature']) > highest['temperature']:
                 highest['temperature'] = int(record['highest_temperature'])
                 highest['date'] = record['date']
             if record['lowest_temperature'].isnumeric() and int(record['lowest_temperature']) < lowest['temperature']:
@@ -129,9 +129,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 2:
         command_type = sys.argv[1]
         all_files = get_files_from_drectory()
-        if check_month_in_command(sys.argv[2]) and check_command_month(sys.argv[2]) != -1:
-            pass
-        elif command_type == '-e' and check_month_in_command(sys.argv[2]) is not True:
+        if command_type == '-e':
             file_names = get_year_file_names(all_files, sys.argv[2])
             file_data = parse_files(file_names)
             get_year_values(file_data)
