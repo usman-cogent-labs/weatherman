@@ -80,7 +80,7 @@ def parse_files(filenames):
     return data
 
 
-def get_yearly_data(data):
+def print_yearly_data(data):
     highest = {"temperature": 0, "date": ''}
     lowest = {"temperature": 1000, "date": ''}
     humidest = {"temperature": 0, "date": ''}
@@ -118,8 +118,8 @@ def check_command_month(data):
         return -1
 
 
-def check_month_in_command(data):
-    data = data.split('/')
+def check_month_in_command(command):
+    data = command.split('/')
     if len(data) == 1:
         return False
     else:
@@ -130,8 +130,8 @@ def get_month_data_from_data(data, month):
     return next((item for item in data if item["month"] == month), None)
 
 
-def print_monthly_average_data(data, month):
-    month_data = get_month_data_from_data(data, month)
+def print_monthly_average_data(data):
+    year, month = get_year_month_from_command()
     highest_temp_data = {
         "sum": 0,
         "count": 0,
@@ -144,7 +144,7 @@ def print_monthly_average_data(data, month):
         "sum": 0,
         "count": 0
     }
-    for record in month_data['records']:
+    for record in data['records']:
         if record['highest_temperature'] != '':
             highest_temp_data['sum'] += int(record['highest_temperature'])
             highest_temp_data["count"] += 1
@@ -170,13 +170,19 @@ def draw_month_graph(data, month):
 
 
 def get_year_month_from_command():
-    year, month = sys.argv[2].split('/')
-    month = MONTHS[int(month)]
-    return year, month
+    if check_month_in_command(sys.argv[2]):
+        year, month = sys.argv[2].split('/')
+        month = MONTHS[int(month)]
+        return year, month
+    else:
+        return sys.argv[2]
 
 
 def get_yearly_data(files):
-    year, month = get_year_month_from_command()
+    if check_month_in_command(sys.argv[2]):
+        year, month = get_year_month_from_command()
+    else:
+        year = get_year_month_from_command()
     file_names = get_year_file_names(files, year)
     file_data = parse_files(file_names)
     return file_data
@@ -197,24 +203,16 @@ def print_monthly_data(monthly_data):
             print(Fore.BLUE + '+' * int(record['lowest_temperature']), record['lowest_temperature'] + 'C')
 
 
-
 if __name__ == '__main__':
     if len(sys.argv) > 2:
         command_type = sys.argv[1]
         files = get_files_from_drectory()
         if command_type == '-e':
-            file_names = get_year_file_names(files, sys.argv[2])
-            file_data = parse_files(file_names)
-            get_yearly_data(file_data)
+            yearly_data = get_yearly_data(files)
+            print_yearly_data(yearly_data)
         if command_type == '-a':
-            year, month = get_year_month_from_command()
-            file_names = get_year_file_names(files, year)
-            file_data = parse_files(file_names)
-            print_monthly_average_data(file_data, MONTHS[int(month)])
+            monthly_data = get_monthly_data(files)
+            print_monthly_average_data(monthly_data)
         if command_type == '-c':
             monthly_data = get_monthly_data(files)
             print_monthly_data(monthly_data)
-
-
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
