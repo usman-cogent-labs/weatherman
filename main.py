@@ -1,6 +1,7 @@
 import os
 import sys
 import datetime
+from colorama import Fore
 
 LOWEST_TEMPERATURE = 'Min TemperatureC'
 HIGHEST_TEMPERATURE = 'Max TemperatureC'
@@ -125,13 +126,15 @@ def check_month_in_command(data):
         return True
 
 
-def get_monthly_data(data, month):
-    month_data = next((item for item in data if item["month"] == month), None)
+def get_month_data_from_data(data, month):
+    return next((item for item in data if item["month"] == month), None)
 
+
+def print_monthly_average_data(data, month):
+    month_data = get_month_data_from_data(data, month)
     highest_temp_data = {
         "sum": 0,
         "count": 0,
-
     }
     lowest_temp_data = {
         "sum": 0,
@@ -161,19 +164,57 @@ def get_monthly_data(data, month):
     print(f'Average Mean Humidity: {average_humidity}')
 
 
+def draw_month_graph(data, month):
+    month_data = get_month_data_from_data(data, month)
+    print(month_data)
+
+
+def get_year_month_from_command():
+    year, month = sys.argv[2].split('/')
+    month = MONTHS[int(month)]
+    return year, month
+
+
+def get_yearly_data(files):
+    year, month = get_year_month_from_command()
+    file_names = get_year_file_names(files, year)
+    file_data = parse_files(file_names)
+    return file_data
+
+
+def get_monthly_data(files):
+    year, month = get_year_month_from_command()
+    yearly_data = get_yearly_data(files)
+    monthly_data = get_month_data_from_data(yearly_data, month)
+    return monthly_data
+
+
+def print_monthly_data(monthly_data):
+    for record in monthly_data["records"]:
+        if bool(record['highest_temperature']) is True:
+            print(Fore.RED + '+' * int(record['highest_temperature']), record['highest_temperature'] + 'C')
+        if bool(record['lowest_temperature']) is True:
+            print(Fore.BLUE + '+' * int(record['lowest_temperature']), record['lowest_temperature'] + 'C')
+
+
+
 if __name__ == '__main__':
     if len(sys.argv) > 2:
         command_type = sys.argv[1]
-        all_files = get_files_from_drectory()
+        files = get_files_from_drectory()
         if command_type == '-e':
-            file_names = get_year_file_names(all_files, sys.argv[2])
+            file_names = get_year_file_names(files, sys.argv[2])
             file_data = parse_files(file_names)
             get_yearly_data(file_data)
         if command_type == '-a':
-            year, month = sys.argv[2].split('/')
-            file_names = get_year_file_names(all_files, year)
+            year, month = get_year_month_from_command()
+            file_names = get_year_file_names(files, year)
             file_data = parse_files(file_names)
-            get_monthly_data(file_data, MONTHS[int(month)])
+            print_monthly_average_data(file_data, MONTHS[int(month)])
+        if command_type == '-c':
+            monthly_data = get_monthly_data(files)
+            print_monthly_data(monthly_data)
+
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
