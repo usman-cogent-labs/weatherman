@@ -79,7 +79,7 @@ def parse_files(filenames):
     return data
 
 
-def get_year_values(data):
+def get_yearly_data(data):
     highest = {"temperature": 0, "date": ''}
     lowest = {"temperature": 1000, "date": ''}
     humidest = {"temperature": 0, "date": ''}
@@ -125,6 +125,42 @@ def check_month_in_command(data):
         return True
 
 
+def get_monthly_data(data, month):
+    month_data = next((item for item in data if item["month"] == month), None)
+
+    highest_temp_data = {
+        "sum": 0,
+        "count": 0,
+
+    }
+    lowest_temp_data = {
+        "sum": 0,
+        "count": 0,
+    }
+    humidity_temp_data = {
+        "sum": 0,
+        "count": 0
+    }
+    for record in month_data['records']:
+        if record['highest_temperature'] != '':
+            highest_temp_data['sum'] += int(record['highest_temperature'])
+            highest_temp_data["count"] += 1
+        if record['lowest_temperature'] != '':
+            lowest_temp_data["sum"] += int(record['lowest_temperature'])
+            lowest_temp_data["count"] += 1
+        if record['mean_humidity'] != '':
+            humidity_temp_data["sum"] += int(record['mean_humidity'])
+            humidity_temp_data["count"] += 1
+
+    highest_average = highest_temp_data["sum"] // highest_temp_data["count"]
+    lowest_average = lowest_temp_data["sum"] // lowest_temp_data["count"]
+    average_humidity = humidity_temp_data["sum"] // humidity_temp_data["count"]
+
+    print(f'Highest Average: {highest_average}')
+    print(f'Lowest Average: {lowest_average}')
+    print(f'Average Mean Humidity: {average_humidity}')
+
+
 if __name__ == '__main__':
     if len(sys.argv) > 2:
         command_type = sys.argv[1]
@@ -132,6 +168,12 @@ if __name__ == '__main__':
         if command_type == '-e':
             file_names = get_year_file_names(all_files, sys.argv[2])
             file_data = parse_files(file_names)
-            get_year_values(file_data)
+            get_yearly_data(file_data)
+        if command_type == '-a':
+            year, month = sys.argv[2].split('/')
+            file_names = get_year_file_names(all_files, year)
+            file_data = parse_files(file_names)
+            get_monthly_data(file_data, MONTHS[int(month)])
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
