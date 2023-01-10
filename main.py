@@ -204,7 +204,6 @@ def print_monthly_data(monthly_data):
     print(Style.RESET_ALL)
 
 
-
 def execute_command(command_type, command_data):
     files = get_files_from_drectory()
     if command_type == '-e':
@@ -221,3 +220,4 @@ def execute_command(command_type, command_data):
 if __name__ == '__main__':
     for i in range(1, len(sys.argv), 2):
         execute_command(sys.argv[i], sys.argv[i + 1])
+
