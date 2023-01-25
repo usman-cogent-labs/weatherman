@@ -32,28 +32,26 @@ def get_parameter_indexes(arr):
 def parse_files(filenames):
     data = list()
     for filename in filenames:
-        file = open('weatherfiles/' + filename, 'r')
-        line = file.readline()
-        arr = line.split(',')
-        arr = trim_list_elements(arr)
-        indexes = get_parameter_indexes(arr)
-        records = list()
-        for line in file:
-            line_elements = line.split(',')
-            trimmed_elements = trim_list_elements(line_elements)
-            raw_date = trimmed_elements[0].split('-')
-            year = int(raw_date[0])
-            month = int(raw_date[1])
-            day = int(raw_date[2])
-            date = datetime.datetime(year, month, day)
-            records.append({
-                "date": trimmed_elements[0],
-                "highest_temperature": trimmed_elements[indexes['highest_temp_index']],
-                "lowest_temperature": trimmed_elements[indexes['lowest_temp_index']],
-                "mean_humidity": trimmed_elements[indexes['mean_humidity_index']],
-                "max_humidity": trimmed_elements[indexes['max_humidity_index']],
-            })
-        data.append({"month": date.strftime('%B'), "records": records})
+        with open('weatherfiles/' + filename, 'r') as file_data:
+            csvreader = csv.reader(file_data)
+            header = next(csvreader)
+            header = trim_list_elements(header)
+            indexes = get_parameter_indexes(header)
+            records = list()
+            for row in csvreader:
+                raw_date = row[0].split('-')
+                year = int(raw_date[0])
+                month = int(raw_date[1])
+                day = int(raw_date[2])
+                date = datetime.datetime(year, month, day)
+                records.append({
+                    "date": row[0],
+                    "highest_temperature": row[indexes['highest_temp_index']],
+                    "lowest_temperature": row[indexes['lowest_temp_index']],
+                    "mean_humidity": row[indexes['mean_humidity_index']],
+                    "max_humidity": row[indexes['max_humidity_index']],
+                })
+            data.append({"month": date.strftime('%B'), "records": records})
     return data
 
 
