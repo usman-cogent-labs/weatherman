@@ -1,8 +1,9 @@
-import os
-import sys
-import datetime
+import csv
 import calendar
 from colorama import Fore, Style
+import datetime
+import os
+import sys
 
 LOWEST_TEMPERATURE = 'Min TemperatureC'
 HIGHEST_TEMPERATURE = 'Max TemperatureC'
@@ -10,9 +11,9 @@ MEAN_HUMIDITY_TEMPERATURE = 'Mean Humidity'
 MAX_HUMIDITY_TEMPERATURE = 'Max Humidity'
 
 
-def get_year_file_names(files, year):
-    year_files = [file for file in files if year in file]
-    return year_files
+def get_year_file_names(weather_reports, year):
+    yearly_weather_reports = [weather_report for weather_report in weather_reports if year in weather_report]
+    return yearly_weather_reports
 
 
 def trim_list_elements(arr):
@@ -56,6 +57,11 @@ def parse_files(filenames):
     return data
 
 
+def get_formatted_date(date):
+    year, month, day = date.split('-')
+    return datetime.date(int(year), int(month), int(day)).strftime('%B %d')
+
+
 def print_yearly_data(data):
     highest = {"temperature": 0, "date": ''}
     lowest = {"temperature": 1000, "date": ''}
@@ -66,13 +72,13 @@ def print_yearly_data(data):
             if record['highest_temperature'].isnumeric() \
                     and int(record['highest_temperature']) > highest['temperature']:
                 highest['temperature'] = int(record['highest_temperature'])
-                highest['date'] = datetime.datetime(record['date'].split('-')).strftime('%B %d')
+                highest['date'] = get_formatted_date(record['date'])
             if record['lowest_temperature'].isnumeric() and int(record['lowest_temperature']) < lowest['temperature']:
                 lowest["temperature"] = int(record['lowest_temperature'])
-                lowest['date'] = datetime.datetime(record['date'].split('-')).strftime('%B %d')
+                lowest['date'] = get_formatted_date(record['date'])
             if record['max_humidity'].isnumeric() and int(record['max_humidity']) > humidest['temperature']:
                 humidest['temperature'] = int(record['max_humidity'])
-                humidest['date'] = datetime.datetime(record['date'].split('-')).strftime('%B %d')
+                humidest['date'] = get_formatted_date(record['date'])
     print(f"Highest: {highest['temperature']}C on {highest['date']}")
     print(f"Lowest: {lowest['temperature']}C on {lowest['date']}")
     print(f"Humidity: {humidest['temperature']}% on {humidest['date']}")
