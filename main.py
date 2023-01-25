@@ -174,5 +174,5 @@ def execute_command(command_type, command_data):
 
 if __name__ == "__main__":
     for parameter in range(1, len(sys.argv), 2):
-        execute_command(sys.argv[i], sys.argv[parameter + 1])
+        execute_command(sys.argv[parameter], sys.argv[parameter + 1])
 
