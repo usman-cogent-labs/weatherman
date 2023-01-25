@@ -1,46 +1,22 @@
 import os
 import sys
 import datetime
+import calendar
 from colorama import Fore, Style
 
 LOWEST_TEMPERATURE = 'Min TemperatureC'
 HIGHEST_TEMPERATURE = 'Max TemperatureC'
 MEAN_HUMIDITY_TEMPERATURE = 'Mean Humidity'
 MAX_HUMIDITY_TEMPERATURE = 'Max Humidity'
-MONTHS = {
-    1: 'January',
-    2: 'February',
-    3: 'March',
-    4: 'April',
-    5: 'May',
-    6: 'June',
-    7: 'July',
-    8: 'August',
-    9: 'September',
-    10: 'October',
-    11: 'November',
-    12: 'December'
-
-}
-
-
-def get_files_from_drectory():
-    return os.listdir('weatherfiles/')
 
 
 def get_year_file_names(files, year):
-    year_files = []
-    for file in files:
-        if year in file:
-            year_files.append(file)
+    year_files = [file for file in files if year in file]
     return year_files
 
 
 def trim_list_elements(arr):
-    stripped_elements = []
-    for element in arr:
-        stripped_elements.append(element.strip())
-    return stripped_elements
+    return [element.strip() for element in arr]
 
 
 def get_parameter_indexes(arr):
@@ -90,40 +66,21 @@ def print_yearly_data(data):
             if record['highest_temperature'].isnumeric() \
                     and int(record['highest_temperature']) > highest['temperature']:
                 highest['temperature'] = int(record['highest_temperature'])
-                highest['date'] = record['date']
+                highest['date'] = datetime.datetime(record['date'].split('-')).strftime('%B %d')
             if record['lowest_temperature'].isnumeric() and int(record['lowest_temperature']) < lowest['temperature']:
                 lowest["temperature"] = int(record['lowest_temperature'])
-                lowest['date'] = record['date']
+                lowest['date'] = datetime.datetime(record['date'].split('-')).strftime('%B %d')
             if record['max_humidity'].isnumeric() and int(record['max_humidity']) > humidest['temperature']:
                 humidest['temperature'] = int(record['max_humidity'])
-                humidest['date'] = record['date']
-    highest_date = highest['date'].split('-')
-    lowest_date = lowest['date'].split('-')
-    humidest_date = humidest['date'].split('-')
-    print(
-        f"Highest: {highest['temperature']}C on {datetime.datetime(int(highest_date[0]), int(highest_date[1]), int(highest_date[2])).strftime('%B %d')}")
-    print(
-        f"Lowest: {lowest['temperature']}C on {datetime.datetime(int(lowest_date[0]), int(lowest_date[1]), int(lowest_date[2])).strftime('%B %d')}")
-    print(
-        f"Humidity: {humidest['temperature']}% on {datetime.datetime(int(humidest_date[0]), int(humidest_date[1]), int(humidest_date[2])).strftime('%B %d')}")
-
-
-def check_command_month(data):
-    data = data.split('/')
-    if int(data[1]) > max(MONTHS.keys()) or int(data[1]) < min(MONTHS.keys()):
-        return -1
-    elif MONTHS[int(data[1])]:
-        return MONTHS[int(data[1])]
-    else:
-        return -1
+                humidest['date'] = datetime.datetime(record['date'].split('-')).strftime('%B %d')
+    print(f"Highest: {highest['temperature']}C on {highest['date']}")
+    print(f"Lowest: {lowest['temperature']}C on {lowest['date']}")
+    print(f"Humidity: {humidest['temperature']}% on {humidest['date']}")
 
 
 def check_month_in_command(command_data):
     data = command_data.split('/')
-    if len(data) == 1:
-        return False
-    else:
-        return True
+    return False if len(data) == 1 else True
 
 
 def get_month_data_from_data(data, month):
@@ -131,7 +88,6 @@ def get_month_data_from_data(data, month):
 
 
 def print_monthly_average_data(data, command_data):
-    year, month = get_year_month_from_command(command_data)
     highest_temp_data = {
         "sum": 0,
         "count": 0,
@@ -165,24 +121,19 @@ def print_monthly_average_data(data, command_data):
 
 
 def draw_month_graph(data, month):
-    month_data = get_month_data_from_data(data, month)
-    print(month_data)
+    print(get_month_data_from_data(data, month))
 
 
 def get_year_month_from_command(command_data):
-    if check_month_in_command(command_data):
-        year, month = command_data.split('/')
-        month = MONTHS[int(month)]
-        return year, month
-    else:
+    if not check_month_in_command(command_data):
         return command_data
+    year, month = command_data.split('/')
+    month = calendar.month_name[int(month)]
+    return year, month
 
 
 def get_yearly_data(files, command_data):
-    if check_month_in_command(command_data):
-        year, month = get_year_month_from_command(command_data)
-    else:
-        year = get_year_month_from_command(command_data)
+    year = get_year_month_from_command(command_data)
     file_names = get_year_file_names(files, year)
     file_data = parse_files(file_names)
     return file_data
@@ -197,27 +148,31 @@ def get_monthly_data(files, command_data):
 
 def print_monthly_data(monthly_data):
     for record in monthly_data["records"]:
-        if bool(record['highest_temperature']) is True:
-            print(Fore.RED + '+' * int(record['highest_temperature']), record['highest_temperature'] + 'C')
-        if bool(record['lowest_temperature']) is True:
-            print(Fore.BLUE + '+' * int(record['lowest_temperature']), record['lowest_temperature'] + 'C')
+        if bool(record["highest_temperature"]) is True:
+            print(Fore.RED + "+" * int(record["highest_temperature"]), record["highest_temperature"] + "C")
+        if bool(record["lowest_temperature"]) is True:
+            print(Fore.BLUE + "+" * int(record["lowest_temperature"]), record["lowest_temperature"] + "C")
     print(Style.RESET_ALL)
 
 
+def get_files_from_directory():
+    return os.listdir('weatherfiles/')
+
+
 def execute_command(command_type, command_data):
-    files = get_files_from_drectory()
-    if command_type == '-e':
+    files = get_files_from_directory()
+    if command_type == "-e":
         yearly_data = get_yearly_data(files, command_data)
         print_yearly_data(yearly_data)
-    if command_type == '-a':
+    if command_type == "-a":
         monthly_data = get_monthly_data(files, command_data)
         print_monthly_average_data(monthly_data, command_data)
-    if command_type == '-c':
+    if command_type == "-c":
         monthly_data = get_monthly_data(files, command_data)
         print_monthly_data(monthly_data)
 
 
-if __name__ == '__main__':
-    for i in range(1, len(sys.argv), 2):
-        execute_command(sys.argv[i], sys.argv[i + 1])
+if __name__ == "__main__":
+    for parameter in range(1, len(sys.argv), 2):
+        execute_command(sys.argv[i], sys.argv[parameter + 1])
 
