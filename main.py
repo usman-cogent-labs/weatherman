@@ -5,51 +5,34 @@ import datetime
 import os
 import sys
 
-LOWEST_TEMPERATURE = 'Min TemperatureC'
-HIGHEST_TEMPERATURE = 'Max TemperatureC'
-MEAN_HUMIDITY_TEMPERATURE = 'Mean Humidity'
-MAX_HUMIDITY_TEMPERATURE = 'Max Humidity'
-
 
 def get_year_file_names(weather_reports, year):
-    yearly_weather_reports = [weather_report for weather_report in weather_reports if year in weather_report]
-    return yearly_weather_reports
+    return [weather_report for weather_report in weather_reports if year in weather_report]
 
 
 def trim_list_elements(arr):
     return [element.strip() for element in arr]
 
 
-def get_parameter_indexes(arr):
-    return dict(
-        highest_temp_index=arr.index(HIGHEST_TEMPERATURE),
-        lowest_temp_index=arr.index(LOWEST_TEMPERATURE),
-        mean_humidity_index=arr.index(MEAN_HUMIDITY_TEMPERATURE),
-        max_humidity_index=arr.index(MAX_HUMIDITY_TEMPERATURE)
-    )
-
-
-def parse_files(filenames):
+def parse_weather_files(weather_filenames):
     data = list()
-    for filename in filenames:
+    for filename in weather_filenames:
         with open('weatherfiles/' + filename, 'r') as file_data:
-            csvreader = csv.reader(file_data)
-            header = next(csvreader)
-            header = trim_list_elements(header)
-            indexes = get_parameter_indexes(header)
+            csvreader = csv.DictReader(file_data)
             records = list()
             for row in csvreader:
-                raw_date = row[0].split('-')
+                print(row)
+                raw_date = row['PKT'].split('-')
                 year = int(raw_date[0])
                 month = int(raw_date[1])
                 day = int(raw_date[2])
                 date = datetime.datetime(year, month, day)
                 records.append({
-                    "date": row[0],
-                    "highest_temperature": row[indexes['highest_temp_index']],
-                    "lowest_temperature": row[indexes['lowest_temp_index']],
-                    "mean_humidity": row[indexes['mean_humidity_index']],
-                    "max_humidity": row[indexes['max_humidity_index']],
+                    "date": row['PKT'],
+                    "highest_temperature": row['Max TemperatureC'],
+                    "lowest_temperature": row['Min TemperatureC'],
+                    "mean_humidity": row[' Mean Humidity'],
+                    "max_humidity": row['Max Humidity'],
                 })
             data.append({"month": date.strftime('%B'), "records": records})
     return data
@@ -83,8 +66,7 @@ def print_yearly_data(data):
 
 
 def check_month_in_command(command_data):
-    data = command_data.split('/')
-    return False if len(data) == 1 else True
+    return False if len(command_data.split('/')) == 1 else True
 
 
 def get_month_data_from_data(data, month):
@@ -137,9 +119,12 @@ def get_year_month_from_command(command_data):
 
 
 def get_yearly_data(files, command_data):
-    year = get_year_month_from_command(command_data)
+    if len(get_year_month_from_command(command_data)) == 2:
+        year, month = get_year_month_from_command(command_data)
+    else:
+        year = get_year_month_from_command(command_data)
     file_names = get_year_file_names(files, year)
-    file_data = parse_files(file_names)
+    file_data = parse_weather_files(file_names)
     return file_data
 
 
