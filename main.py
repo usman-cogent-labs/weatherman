@@ -107,10 +107,6 @@ def print_monthly_average_data(data, command_data):
     print(f"Average Mean Humidity: {average_humidity}")
 
 
-def draw_month_graph(data, month):
-    print(get_month_data_from_data(data, month))
-
-
 def get_year_month_from_command(command_data):
     if not check_month_in_command(command_data):
         return command_data
