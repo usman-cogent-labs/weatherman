@@ -5,8 +5,6 @@ from colorama import Fore, Style
 import datetime
 import os
 import sys
-
-
 def get_year_file_names(weather_reports, year):
     return [weather_report for weather_report in weather_reports if year in weather_report]
 
