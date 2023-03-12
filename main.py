@@ -1,3 +1,4 @@
+import argparse
 import csv
 import calendar
 from colorama import Fore, Style
@@ -21,7 +22,6 @@ def parse_weather_files(weather_filenames):
             csvreader = csv.DictReader(file_data)
             records = list()
             for row in csvreader:
-                print(row)
                 raw_date = row['PKT'].split('-')
                 year = int(raw_date[0])
                 month = int(raw_date[1])
