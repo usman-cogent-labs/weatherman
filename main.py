@@ -1,9 +1,16 @@
+import argparse
 import csv
 import calendar
 from colorama import Fore, Style
 import datetime
 import os
 import sys
+
+parser = argparse.ArgumentParser(description='Process some files.')
+parser.add_argument('-c', '--current', type=str, help='current year/month in YYYY/MM format')
+parser.add_argument('-a', '--average', type=str, help='average year/month in YYYY/MM format')
+parser.add_argument('-e', '--extreme', type=int, help='the year to filter files by')
+args = parser.parse_args()
 
 
 def get_year_file_names(weather_reports, year):
@@ -123,6 +130,7 @@ def get_yearly_readings(files, command_line_arguments):
         if len(get_year_month_from_command(command_line_arguments)) == 2\
         else (get_year_month_from_command(command_line_arguments), None)
     file_names = get_year_file_names(files, year)
+
     return parse_weather_files(file_names)
 
 
@@ -146,21 +154,19 @@ def get_files_from_directory():
     return os.listdir("weatherfiles/")
 
 
-def execute_command(command_type, command_line_arguments):
+def execute_command():
     files = get_files_from_directory()
-    match command_type:
-        case "-e":
-            yearly_readings = get_yearly_readings(files, command_line_arguments)
-            print_yearly_readings(yearly_readings)
-        case "-a":
-            monthly_readings = get_monthly_weather_readings(files, command_line_arguments)
-            print_monthly_average_readings(monthly_readings)
-        case "-c":
-            monthly_readings = get_monthly_weather_readings(files, command_line_arguments)
-            print_monthly_readings(monthly_readings)
+    if args.extreme:
+        yearly_readings = get_yearly_readings(files)
+        print_yearly_readings(yearly_readings)
+    if args.average:
+        monthly_readings = get_monthly_weather_readings(files)
+        print_monthly_average_readings(monthly_readings)
+    if args.current:
+        monthly_readings = get_monthly_weather_readings(files)
+        print_monthly_readings(monthly_readings)
 
 
 if __name__ == "__main__":
-    for parameter in range(1, len(sys.argv), 2):
-        execute_command(sys.argv[parameter], sys.argv[parameter + 1])
+    execute_command()
 
