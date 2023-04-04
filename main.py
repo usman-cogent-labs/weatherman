@@ -4,7 +4,6 @@ import calendar
 from colorama import Fore, Style
 import datetime
 import os
-import sys
 
 parser = argparse.ArgumentParser(description='Process some files.')
 parser.add_argument('-c', '--current', type=str, help='current year/month in YYYY/MM format')
