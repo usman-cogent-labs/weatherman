@@ -3,6 +3,7 @@ import csv
 import calendar
 from colorama import Fore, Style
 import datetime
+import glob
 import os
 
 
@@ -20,7 +21,7 @@ def get_year_file_names(weather_reports, year):
 def parse_weather_files(weather_filenames):
     readings = []
     for filename in weather_filenames:
-        with open("weatherfiles/" + filename, "r") as weather_file:
+        with open(filename, "r") as weather_file:
             weather_readings = csv.DictReader(weather_file)
             records = []
 
@@ -147,7 +148,8 @@ def execute_command():
     files = get_files_from_directory()
     print(args)
     if args.extreme:
-        yearly_readings = get_yearly_readings(files)
+        file_names = glob.glob(os.path.join('weatherfiles/', f'*_{args.extreme}_*'))
+        yearly_readings = parse_weather_files(file_names)
         print_yearly_readings(yearly_readings)
     if args.average:
         monthly_readings = get_monthly_weather_readings(files)
