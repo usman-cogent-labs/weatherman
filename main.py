@@ -93,7 +93,6 @@ def print_monthly_average_readings(monthly_readings):
             if record["mean_humidity"] != "":
                 humidity_temp_data["sum"] += int(record["mean_humidity"])
                 humidity_temp_data["count"] += 1
-
     highest_average = highest_temp_data["sum"] // highest_temp_data["count"]
     lowest_average = lowest_temp_data["sum"] // lowest_temp_data["count"]
     average_humidity = humidity_temp_data["sum"] // humidity_temp_data["count"]
@@ -104,28 +103,29 @@ def print_monthly_average_readings(monthly_readings):
 
 
 def print_monthly_readings(monthly_readings):
-    for record in monthly_readings["records"]:
-        if bool(record["highest_temperature"]):
-            print(f"{Fore.RED} {'+' * int(record['highest_temperature'])} {record['highest_temperature']} C")
-        if bool(record["lowest_temperature"]):
-            print(f"{Fore.BLUE} {'+' * int(record['lowest_temperature'])} {record['lowest_temperature']} C")
+    for monthly_reading in monthly_readings:
+        for record in monthly_reading["records"]:
+            if bool(record["highest_temperature"]):
+                print(f"{Fore.RED} {'+' * int(record['highest_temperature'])} {record['highest_temperature']} C")
+            if bool(record["lowest_temperature"]):
+                print(f"{Fore.BLUE} {'+' * int(record['lowest_temperature'])} {record['lowest_temperature']} C")
 
     print(Style.RESET_ALL)
 
 
 def get_file_names(file_path):
-    return glob.glob(os.path.join('weatherfiles/', f'*_{file_path}_*'))
+    return glob.glob(os.path.join('weatherfiles/', file_path))
 
 
 def get_monthly_readings(command_type):
     year, month = command_type.split('/')
     month_name = calendar.month_name[int(month)][:3]
-    return parse_weather_files(get_file_names(f'{year}_{month_name}'))
+    return parse_weather_files(get_file_names(f'*_{year}_{month_name}*'))
 
 
 def execute_command():
     if args.extreme:
-        file_names = glob.glob(os.path.join('weatherfiles/', f'*_{args.extreme}_*'))
+        file_names = get_file_names(f'*_{args.extreme}_*')
         yearly_readings = parse_weather_files(file_names)
         print_yearly_readings(yearly_readings)
     if args.average:
