@@ -5,6 +5,7 @@ from colorama import Fore, Style
 import datetime
 import os
 
+
 parser = argparse.ArgumentParser(description='Process some files.')
 parser.add_argument('-c', '--current', type=str, help='current year/month in YYYY/MM format')
 parser.add_argument('-a', '--average', type=str, help='average year/month in YYYY/MM format')
@@ -16,18 +17,14 @@ def get_year_file_names(weather_reports, year):
     return [weather_report for weather_report in weather_reports if year in weather_report]
 
 
-def trim_list_elements(arr):
-    return [element.strip() for element in arr]
-
-
 def parse_weather_files(weather_filenames):
-    readings = list()
+    readings = []
     for filename in weather_filenames:
-        with open("weatherfiles/" + filename, "r") as file_data:
-            csvreader = csv.DictReader(file_data)
-            records = list()
+        with open("weatherfiles/" + filename, "r") as weather_file:
+            weather_readings = csv.DictReader(weather_file)
+            records = []
 
-            for row in csvreader:
+            for row in weather_readings:
                 raw_date = row["PKT"].split("-")
                 year = int(raw_date[0])
                 month = int(raw_date[1])
@@ -47,6 +44,7 @@ def parse_weather_files(weather_filenames):
 
 def get_formatted_date(date):
     year, month, day = date.split("-")
+
     return datetime.date(int(year), int(month), int(day)).strftime("%B %d")
 
 
@@ -82,18 +80,10 @@ def get_monthly_readings_from_yearly_readings(yearly_readings, month):
 
 
 def print_monthly_average_readings(data):
-    highest_temp_data = {
-        "sum": 0,
-        "count": 0,
-    }
-    lowest_temp_data = {
-        "sum": 0,
-        "count": 0,
-    }
-    humidity_temp_data = {
-        "sum": 0,
-        "count": 0
-    }
+    highest_temp_data = {}
+    lowest_temp_data = {}
+    humidity_temp_data = {}
+
     for record in data["records"]:
         if record["highest_temperature"] != "":
             highest_temp_data["sum"] += int(record["highest_temperature"])
@@ -141,9 +131,9 @@ def get_monthly_weather_readings(files, command_line_arguments):
 
 def print_monthly_readings(monthly_readings):
     for record in monthly_readings["records"]:
-        if bool(record["highest_temperature"]) is True:
+        if bool(record["highest_temperature"]):
             print(f"{Fore.RED} {'+' * int(record['highest_temperature'])} {record['highest_temperature']} C")
-        if bool(record["lowest_temperature"]) is True:
+        if bool(record["lowest_temperature"]):
             print(f"{Fore.BLUE} {'+' * int(record['lowest_temperature'])} {record['lowest_temperature']} C")
 
     print(Style.RESET_ALL)
@@ -155,6 +145,7 @@ def get_files_from_directory():
 
 def execute_command():
     files = get_files_from_directory()
+    print(args)
     if args.extreme:
         yearly_readings = get_yearly_readings(files)
         print_yearly_readings(yearly_readings)
