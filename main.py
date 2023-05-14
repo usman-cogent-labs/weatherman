@@ -73,38 +73,19 @@ def print_yearly_readings(readings):
     print(f"Humidity: {humidest['temperature']}% on {humidest['date']}")
 
 
+def get_attribute_sum_from_weather_records(records, attribute):
+    return sum(int(record[attribute]) for record in records if record[attribute] != '')
+
+
+def count_non_empty_attribute_readings(records, attribute):
+    return sum(1 for record in records if record[attribute] != '')
+
+
 def print_monthly_average_readings(monthly_readings):
-    highest_temp_data = {
-        "sum": 0,
-        "count": 0
-    }
-    lowest_temp_data = {
-        "sum": 0,
-        "count": 0
-    }
-    humidity_temp_data = {
-        "sum": 0,
-        "count": 0
-    }
-
-    for monthly_reading in monthly_readings:
-        for record in monthly_reading["records"]:
-            if record["highest_temperature"] != "":
-                highest_temp_data["sum"] += int(record["highest_temperature"])
-                highest_temp_data["count"] += 1
-            if record["lowest_temperature"] != "":
-                lowest_temp_data["sum"] += int(record["lowest_temperature"])
-                lowest_temp_data["count"] += 1
-            if record["mean_humidity"] != "":
-                humidity_temp_data["sum"] += int(record["mean_humidity"])
-                humidity_temp_data["count"] += 1
-    highest_average = highest_temp_data["sum"] // highest_temp_data["count"]
-    lowest_average = lowest_temp_data["sum"] // lowest_temp_data["count"]
-    average_humidity = humidity_temp_data["sum"] // humidity_temp_data["count"]
-
-    print(f"Highest Average: {highest_average}")
-    print(f"Lowest Average: {lowest_average}")
-    print(f"Average Mean Humidity: {average_humidity}")
+    records = monthly_readings[0]['records']
+    print(f"Highest Average: {get_attribute_sum_from_weather_records(records, 'highest_temperature') // count_non_empty_attribute_readings(records, 'highest_temperature')}")
+    print(f"Lowest Average: {get_attribute_sum_from_weather_records(records, 'lowest_temperature') // count_non_empty_attribute_readings(records, 'lowest_temperature')}")
+    print(f"Average Mean Humidity: {get_attribute_sum_from_weather_records(records, 'mean_humidity') // count_non_empty_attribute_readings(records, 'mean_humidity')}")
 
 
 def print_monthly_readings(monthly_readings):
