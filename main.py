@@ -1,7 +1,6 @@
 import argparse
 import csv
 import calendar
-from colorama import Fore, Style
 import datetime
 import glob
 import os
@@ -12,6 +11,12 @@ parser.add_argument('-c', '--current', type=str, help='current year/month in YYY
 parser.add_argument('-a', '--average', type=str, help='average year/month in YYYY/MM format')
 parser.add_argument('-e', '--extreme', type=int, help='the year to filter files by')
 args = parser.parse_args()
+
+
+def print_red(str): print("\033[91m {}\033[00m" .format(str))
+
+
+def print_blue(str): print("\033[34m {}\033[00m" .format(str))
 
 
 def parse_weather_files(weather_filenames):
@@ -106,11 +111,9 @@ def print_monthly_readings(monthly_readings):
     for monthly_reading in monthly_readings:
         for record in monthly_reading["records"]:
             if bool(record["highest_temperature"]):
-                print(f"{Fore.RED} {'+' * int(record['highest_temperature'])} {record['highest_temperature']} C")
+                print_red(f"{'+' * int(record['highest_temperature'])} {record['highest_temperature']} C")
             if bool(record["lowest_temperature"]):
-                print(f"{Fore.BLUE} {'+' * int(record['lowest_temperature'])} {record['lowest_temperature']} C")
-
-    print(Style.RESET_ALL)
+                print_blue(f"{'+' * int(record['lowest_temperature'])} {record['lowest_temperature']} C")
 
 
 def get_file_names(file_path):
