@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from InvalidOperationError import InvalidOperationError
 
 
 class Stream(ABC):
