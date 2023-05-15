@@ -51,7 +51,7 @@ class Printer:
             for record in monthly_reading["records"]:
                 if bool(record["highest_temperature"]):
                     self.__print_red(f"{'+' * int(record['highest_temperature'])} {record['highest_temperature']} C")
-                if bool(self, record["lowest_temperature"]):
+                if bool(record["lowest_temperature"]):
                     self.__print_blue(f"{'+' * int(record['lowest_temperature'])} {record['lowest_temperature']} C")
 
     def print_monthly_average_readings(self):
