@@ -4,12 +4,9 @@ from Stream import Stream
 
 
 class FileStream(Stream):
-    def __init__(self, weather_filenames):
-        self.weather_filenames = weather_filenames
-
-    def read(self):
+    def read(self, weather_filenames):
         readings = []
-        for filename in self.weather_filenames:
+        for filename in weather_filenames:
             with open(filename, "r") as weather_file:
                 weather_readings = csv.DictReader(weather_file)
                 records = []
