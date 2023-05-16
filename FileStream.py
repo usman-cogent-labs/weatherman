@@ -13,9 +13,7 @@ class FileStream(Stream):
 
                 for row in weather_readings:
                     raw_date = row["PKT"].split("-")
-                    year = int(raw_date[0])
-                    month = int(raw_date[1])
-                    day = int(raw_date[2])
+                    year, month, day = int(raw_date[0]), int(raw_date[1]), int(raw_date[2])
                     date = datetime.datetime(year, month, day)
                     records.append({
                         "date": row["PKT"],
