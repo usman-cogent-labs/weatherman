@@ -4,10 +4,5 @@ from Stream import Stream
 
 
 class DirectoryStream(Stream):
-    def __init__(self, filepath):
-        self.filepath = filepath
-
-    def read(self):
-        return glob.glob(os.path.join("weatherfiles/", self.filepath))
-
-
+    def read(self, file_path):
+        return glob.glob(os.path.join("weatherfiles/", file_path))
