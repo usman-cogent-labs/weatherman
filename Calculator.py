@@ -11,24 +11,15 @@ class Calculator:
         return sum(1 for record in records if record[attribute] != "")
 
     def calculate_year_weather_readings(self, weather_readings):
-        coldest_day = min(min(weather_readings,
-                              key=lambda x: min(int(record["lowest_temperature"]) for record
-                                                in x["records"]
-                                                if record["lowest_temperature"].isdigit()))["records"],
-                          key=lambda weather_record: self.__get_non_empty_value(weather_record[
-                                                                                    "lowest_temperature"], "+inf"))
-        hottest_day = max(max(weather_readings,
-                              key=lambda x: max(int(record["highest_temperature"]) for record
-                                                in x["records"]
-                                                if record["highest_temperature"].isdigit()))["records"],
-                          key=lambda weather_record: self.__get_non_empty_value(weather_record[
-                                                                                    "highest_temperature"], "-inf"))
-        humid_day = max(max(weather_readings,
-                            key=lambda x: max(int(record["max_humidity"]) for record
-                                              in x["records"]
-                                              if record["max_humidity"].isdigit()))["records"],
-                        key=lambda weather_record: self.__get_non_empty_value(weather_record[
-                                                                                  "max_humidity"], "-inf"))
+        year_weather_records = [weather_reading_record for weather_reading in weather_readings for
+                                weather_reading_record in weather_reading["records"]]
+
+        coldest_day = min(year_weather_records,
+                          key=lambda x: self.__get_non_empty_value(x["lowest_temperature"], "+inf"))
+        hottest_day = max(year_weather_records,
+                          key=lambda x: self.__get_non_empty_value(x["highest_temperature"], "-inf"))
+        humid_day = max(year_weather_records, key=lambda x: self.__get_non_empty_value(x["max_humidity"], "-inf"))
+
         return {
             "hottest_day": {"temperature": hottest_day["highest_temperature"], "date": hottest_day["date"]},
             "coldest_day": {"temperature": coldest_day["lowest_temperature"], "date": coldest_day["date"]},
