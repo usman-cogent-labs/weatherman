@@ -22,12 +22,12 @@ class Driver:
             printer = Printer(yearly_readings)
             printer.print_yearly_readings()
         if self.args.average:
-            file_names = directory_stream.read(Helpers.get_monthly_readings(self.args.average))
+            file_names = directory_stream.read(Helpers.get_year_month_from_command(self.args.average))
             monthly_readings = file_stream.read(file_names)
             printer = Printer(monthly_readings)
             printer.print_monthly_average_readings()
         if self.args.current:
-            file_names = directory_stream.read(Helpers.get_monthly_readings(self.args.current))
+            file_names = directory_stream.read(Helpers.get_year_month_from_command(self.args.current))
             monthly_readings = file_stream.read(file_names)
             printer = Printer(monthly_readings)
             printer.print_monthly_readings()

@@ -12,7 +12,7 @@ class Calculator:
 
     def calculate_year_weather_readings(self, weather_readings):
         coldest_day = min(min(weather_readings,
-                              key=lambda x: max(int(record["lowest_temperature"]) for record
+                              key=lambda x: min(int(record["lowest_temperature"]) for record
                                                 in x["records"]
                                                 if record["lowest_temperature"].isdigit()))["records"],
                           key=lambda weather_record: self.__get_non_empty_value(weather_record[
